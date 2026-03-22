@@ -1,0 +1,125 @@
+argocd:
+  # Name of the ArgoCD Application resource
+  applicationName: hyperfleet-api
+
+  # Namespace where the ArgoCD Application will be created
+  namespace: argocd
+
+  # Target namespace where hyperfleet-api will be deployed
+  targetNamespace: hyperfleet-system
+
+  # Project in ArgoCD (use 'default' if not using ArgoCD Projects)
+  project: default
+
+  # Source configuration for the hyperfleet-api chart
+  source:
+    # Git repository URL
+    repoURL: https://github.com/openshift-hyperfleet/hyperfleet-api.git
+    # Target revision (branch, tag, or commit)
+    targetRevision: v0.1.1
+    # Path to the chart within the repository
+    path: charts
+
+  # Sync policy configuration
+  syncPolicy:
+    automated:
+      # Enable auto-sync
+      prune: true
+      # Enable self-healing
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+  # Additional helm values to pass to hyperfleet-api chart
+  # These will be passed as --helm-set-string or via values
+  helmValues:
+    serviceAccount:
+      name: hyperfleet-api-sa
+
+    # Configure volumes to mount the SecretProviderClass
+    volumes:
+      - name: secrets-store
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: hyperfleet-api-aws-secrets
+
+    volumeMounts:
+      - name: secrets-store
+        mountPath: /mnt/secrets-store
+        readOnly: true
+
+    # Reference the secret created by SecretProviderClass for database credentials
+    env:
+      - name: DB_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: hyperfleet-api-db-credentials
+            key: username
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: hyperfleet-api-db-credentials
+            key: password
+      - name: DB_HOST
+        valueFrom:
+          secretKeyRef:
+            name: hyperfleet-api-db-credentials
+            key: host
+      - name: DB_PORT
+        valueFrom:
+          secretKeyRef:
+            name: hyperfleet-api-db-credentials
+            key: port
+      - name: DB_NAME
+        valueFrom:
+          secretKeyRef:
+            name: hyperfleet-api-db-credentials
+            key: database
+
+# SecretProviderClass configuration for AWS Pod Identity
+secretProviderClass:
+  # Enable SecretProviderClass creation
+  enabled: true
+
+  # Name of the SecretProviderClass
+  name: hyperfleet-api-aws-secrets
+
+  # AWS region where secrets are stored
+  region: us-east-1
+
+  # AWS Secrets Manager secret ARN or name
+  secretName: hyperfleet-api/rds-credentials
+
+  # Objects to retrieve from AWS Secrets Manager
+  objects:
+    - objectName: hyperfleet-api/rds-credentials
+      objectType: secretsmanager
+      jmesPath:
+        - path: username
+          objectAlias: db-username
+        - path: password
+          objectAlias: db-password
+        - path: host
+          objectAlias: db-host
+        - path: port
+          objectAlias: db-port
+        - path: database
+          objectAlias: db-name
+
+  # Secret to create with the retrieved data
+  secretObjects:
+    - secretName: hyperfleet-api-db-credentials
+      type: Opaque
+      data:
+        - objectName: db-username
+          key: username
+        - objectName: db-password
+          key: password
+        - objectName: db-host
+          key: host
+        - objectName: db-port
+          key: port
+        - objectName: db-name
+          key: database
