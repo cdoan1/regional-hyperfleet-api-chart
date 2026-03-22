@@ -1,4 +1,4 @@
-hyperfleet-api:
+hyperfleet-api-chart:
   # Name of the ArgoCD Application resource
   applicationName: hyperfleet-api
 
