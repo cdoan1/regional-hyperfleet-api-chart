@@ -1,4 +1,4 @@
-argocd:
+hyperfleet-api:
   # Name of the ArgoCD Application resource
   applicationName: hyperfleet-api
 

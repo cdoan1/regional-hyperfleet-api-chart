@@ -27,16 +27,16 @@ The following table lists the configurable parameters:
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `argocd.applicationName` | Name of the ArgoCD Application | `hyperfleet-api` |
-| `argocd.namespace` | Namespace where ArgoCD Application will be created | `argocd` |
-| `argocd.targetNamespace` | Namespace where hyperfleet-api will be deployed | `hyperfleet-system` |
-| `argocd.project` | ArgoCD Project | `default` |
-| `argocd.source.repoURL` | Git repository URL | `https://github.com/openshift-hyperfleet/hyperfleet-api.git` |
-| `argocd.source.targetRevision` | Branch, tag, or commit | `v0.1.1` |
-| `argocd.source.path` | Path to the chart in the repository | `charts` |
-| `argocd.syncPolicy.automated.prune` | Enable automatic pruning | `true` |
-| `argocd.syncPolicy.automated.selfHeal` | Enable self-healing | `true` |
-| `argocd.helmValues` | Additional values to pass to hyperfleet-api chart | See below |
+| `hyperfleet-api.applicationName` | Name of the ArgoCD Application | `hyperfleet-api` |
+| `hyperfleet-api.namespace` | Namespace where ArgoCD Application will be created | `argocd` |
+| `hyperfleet-api.targetNamespace` | Namespace where hyperfleet-api will be deployed | `hyperfleet-system` |
+| `hyperfleet-api.project` | ArgoCD Project | `default` |
+| `hyperfleet-api.source.repoURL` | Git repository URL | `https://github.com/openshift-hyperfleet/hyperfleet-api.git` |
+| `hyperfleet-api.source.targetRevision` | Branch, tag, or commit | `v0.1.1` |
+| `hyperfleet-api.source.path` | Path to the chart in the repository | `charts` |
+| `hyperfleet-api.syncPolicy.automated.prune` | Enable automatic pruning | `true` |
+| `hyperfleet-api.syncPolicy.automated.selfHeal` | Enable self-healing | `true` |
+| `hyperfleet-api.helmValues` | Additional values to pass to hyperfleet-api chart | See below |
 | `secretProviderClass.enabled` | Enable SecretProviderClass for AWS secrets | `true` |
 | `secretProviderClass.name` | Name of the SecretProviderClass | `hyperfleet-api-aws-secrets` |
 | `secretProviderClass.region` | AWS region for Secrets Manager | `us-east-1` |
@@ -86,7 +86,7 @@ This chart includes support for AWS Pod Identity to securely access RDS database
 ## Example Custom Values
 
 ```yaml
-argocd:
+hyperfleet-api:
   targetNamespace: my-namespace
   source:
     targetRevision: v1.0.0
